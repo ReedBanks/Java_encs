@@ -17,8 +17,6 @@ import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ToggleGroup;
 
@@ -35,10 +33,8 @@ public class HelloController {
     @FXML
     private Button OpenFilebtn;
 
-    //encs
     @FXML
     private RadioButton DesRadio;
-
 
     @FXML
     private Button EncryptFilebtn;
@@ -54,106 +50,96 @@ public class HelloController {
     @FXML
     private Label encInfo;
 
-
     public void HometoEncryption(ActionEvent e) throws IOException {
-    homeEncryptionBtn.getScene().getWindow().hide();
-        FXMLLoader fxmlLoader=new FXMLLoader(HelloApplication.class.getResource("encryption.fxml"));
-        Scene scene=new Scene(fxmlLoader.load());
-        Stage encStage=new Stage();
+        homeEncryptionBtn.getScene().getWindow().hide();
+        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("encryption.fxml"));
+        Scene scene = new Scene(fxmlLoader.load());
+        Stage encStage = new Stage();
         encStage.setTitle("Encryption");
         encStage.setScene(scene);
         encStage.show();
-
     }
+
     public void HometoDecryption(ActionEvent e) throws IOException {
         homeDecryptionBtn.getScene().getWindow().hide();
-        FXMLLoader fxmlLoader=new FXMLLoader(HelloApplication.class.getResource("decryption.fxml"));
-        Scene scene=new Scene(fxmlLoader.load());
-        Stage decStage=new Stage();
+        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("decryption.fxml"));
+        Scene scene = new Scene(fxmlLoader.load());
+        Stage decStage = new Stage();
         decStage.setTitle("Decryption");
         decStage.setScene(scene);
         decStage.show();
     }
 
-    public void SelectedFile() throws NoSuchAlgorithmException {
-        FileChooser choosefile=new FileChooser();
-        choosefile.setTitle("Open .open file");
-        //get file
-        choosefile.getExtensionFilters().add(new FileChooser.ExtensionFilter(".open","*.open"));
-        String path=" "+choosefile.showOpenDialog(null).getAbsolutePath();
-        SelectedOpenFilelbl.setText(path);
-
+    public void SelectedFile() {
+        FileChooser choosefile = new FileChooser();
+        choosefile.setTitle("Open File");
+        choosefile.getExtensionFilters().add(new FileChooser.ExtensionFilter("Text Files", "*.txt"));
+        File selectedFile = choosefile.showOpenDialog(null);
+        if (selectedFile != null) {
+            SelectedOpenFilelbl.setText(selectedFile.getAbsolutePath());
+        } else {
+            SelectedOpenFilelbl.setText("No file selected");
+        }
     }
 
-    // encryot file and write to .close file
-public  void PerformEncryption(ActionEvent e) throws NoSuchAlgorithmException, IOException {
-    String use=" ";
-    String CorrectPath=correctFilePath(SelectedOpenFilelbl.getText());
-    if(DesRadio.isSelected()){
-        use="DES";
-        System.out.println(CorrectPath);
-        DESEncrypt(CorrectPath);//correct filepath
+    public void PerformEncryption(ActionEvent e) throws NoSuchAlgorithmException, IOException {
+        String use = "";
+        String correctPath = correctFilePath(SelectedOpenFilelbl.getText());
+        if (DesRadio.isSelected()) {
+            use = "DES";
+            DESEncrypt(correctPath);
+        } else if (RsaRadio.isSelected()) {
+            use = "RSA";
+        }
+        encInfo.setText("Encrypting: " + SelectedOpenFilelbl.getText() + "\nAlgorithm: " + use);
     }
-    else if(RsaRadio.isSelected()){
-        use="RSA";
-    }
-   encInfo.setText("Encrypting : "+SelectedOpenFilelbl.getText()+"\nAlgorithm : "+use);
-
-}
-
 
     public static void DESEncrypt(String path) throws NoSuchAlgorithmException, IOException {
-        KeyGenerator keygen=KeyGenerator.getInstance("DES");
-        SecureRandom secureRandom=new SecureRandom();
+        KeyGenerator keygen = KeyGenerator.getInstance("DES");
+        SecureRandom secureRandom = new SecureRandom();
         keygen.init(secureRandom);
-        Key key=keygen.generateKey();
+        Key key = keygen.generateKey();
 
-        File file = new File(path);
-        if (!file.exists()) {
+        File inputFile = new File(path);
+        if (!inputFile.exists()) {
             System.out.println("File does not exist: " + path);
-            System.out.println("Creating file >>>"+ path);
-            file.createNewFile();
+            return;
         }
-        try{
-            BufferedReader data=new BufferedReader(new FileReader(path));
+
+        File outputFile = new File("C:\\des.close");
+        try (BufferedReader data = new BufferedReader(new FileReader(inputFile));
+             BufferedOutputStream writer = new BufferedOutputStream(new FileOutputStream(outputFile))) {
             String line;
-            Cipher cipher= Cipher.getInstance("DES/ECB/PKCS5Padding");
-            cipher.init(cipher.ENCRYPT_MODE,key);//performing encryption with generated key
-            BufferedOutputStream writer = new BufferedOutputStream(new FileOutputStream("C:\\des.close"));
+            Cipher cipher = Cipher.getInstance("DES/ECB/PKCS5Padding");
+            cipher.init(Cipher.ENCRYPT_MODE, key);
 
-            byte[] msg=new byte[8192];
-            int byteRead;
+            writer.write(("Key : " + key).getBytes());
 
-            writer.write(("Key : "+key).getBytes());
-            //read data and encrypt piece by piece
-            while ( (line=data.readLine()) != null) {
-                System.out.println(line);
-                byte[] inputBytes=line.getBytes(StandardCharsets.UTF_8);
-                byte[] outputBytes=cipher.update(inputBytes);
-                if(outputBytes != null){
+            while ((line = data.readLine()) != null) {
+                byte[] inputBytes = line.getBytes(StandardCharsets.UTF_8);
+                byte[] outputBytes = cipher.update(inputBytes);
+                if (outputBytes != null) {
                     writer.write(outputBytes);
                 }
             }
-
-            //converting byte array to hex string
-            String hash=bytesToHex(msg);
-            System.out.println("Hash : "+hash);
-
-        }
-        catch (IOException | NoSuchPaddingException | InvalidKeyException ex) {
+            byte[] finalBytes = cipher.doFinal();
+            if (finalBytes != null) {
+                writer.write(finalBytes);
+            }
+        } catch (IOException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException ex) {
             throw new RuntimeException(ex);
         }
     }
-    //converting byte arr to hex
-    private static String bytesToHex(byte[] bytes){
-        StringBuilder hexstring=new StringBuilder();
-        for (int i = 0; i < bytes.length; i++) {
-            hexstring.append(Integer.toHexString(0xFF& bytes[i]));
+
+    private static String bytesToHex(byte[] bytes) {
+        StringBuilder hexString = new StringBuilder();
+        for (byte aByte : bytes) {
+            hexString.append(Integer.toHexString(0xFF & aByte));
         }
-        return hexstring.toString();
-    }
-    private  String correctFilePath(String path) {
-        return path.replace("\\", "\\\\");
+        return hexString.toString();
     }
 
+    private String correctFilePath(String path) {
+        return path.replace("\\", "\\\\");
+    }
 }
