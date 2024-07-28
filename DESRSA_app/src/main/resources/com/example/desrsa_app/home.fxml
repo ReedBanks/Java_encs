@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.desrsa_app.HelloController">
+   <children>
+      <Button fx:id="homeEncryptionBtn" layoutX="218.0" layoutY="119.0" mnemonicParsing="false" onAction="#HometoEncryption" prefHeight="51.0" prefWidth="164.0" text="Encryption" />
+      <Button fx:id="homeDecryptionBtn" layoutX="218.0" layoutY="215.0" mnemonicParsing="false" onAction="#HometoDecryption" prefHeight="51.0" prefWidth="164.0" text="Decryption" />
+   </children>
+</AnchorPane>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.desrsa_app.HelloController">
+   <children>
+      <Button fx:id="OpenFilebtn" layoutX="436.0" layoutY="59.0" mnemonicParsing="false" onAction="#SelectedFile" text="Open File" />
+      <RadioButton fx:id="DesRadio" layoutX="42.0" layoutY="233.0" mnemonicParsing="false" text="DES ">
+         <toggleGroup>
+            <ToggleGroup fx:id="algorithm" />
+         </toggleGroup></RadioButton>
+      <RadioButton fx:id="RsaRadio" layoutX="43.0" layoutY="260.0" mnemonicParsing="false" text="RSA" toggleGroup="$algorithm" />
+      <Label layoutX="43.0" layoutY="200.0" prefHeight="25.0" prefWidth="138.0" text="Choose Encryption metod" />
+      <Label layoutX="43.0" layoutY="55.0" prefHeight="25.0" prefWidth="81.0" text="Filename" />
+      <Label fx:id="encInfo" layoutX="43.0" layoutY="86.0" prefHeight="42.0" prefWidth="384.0" text="status" />
+      <Label layoutX="43.0" layoutY="131.0" prefHeight="25.0" prefWidth="90.0" text="time taken" />
+      <Label fx:id="SelectedOpenFilelbl" layoutX="126.0" layoutY="59.0" prefHeight="25.0" prefWidth="298.0" />
+      <Button fx:id="EncryptFilebtn" layoutX="436.0" layoutY="105.0" mnemonicParsing="false" onAction="#PerformEncryption" prefHeight="25.0" prefWidth="67.0" text="Enrcypt" />
+      <Button fx:id="OpenFilebtn2" layoutX="445.0" layoutY="156.0" mnemonicParsing="false" text="Home" />
+      <Label fx:id="time" layoutX="151.0" layoutY="131.0" prefHeight="25.0" prefWidth="90.0" />
+   </children>
+</AnchorPane>
